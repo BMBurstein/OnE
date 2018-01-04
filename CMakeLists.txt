@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/event_dispatcher.hpp
+                 include/bone/move_checker.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
                tests/step_iterator_tests.cpp

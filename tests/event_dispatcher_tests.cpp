@@ -59,7 +59,7 @@ TEST_CASE("event_dispatcher") {
     ed.add(&S::run3);
     ed.add(func1);
     ed.add(func2);
-    ed.add(func3);
+    //ed.add(func3); //wont compile
     ed.add(func4);
     ed.add(&S::flag);
     ed.add(&S::run2);
@@ -87,7 +87,7 @@ TEST_CASE("event_dispatcher") {
 
   SECTION("object const") {
     bone::event_dispatcher<S const> ed;
-    const S s;
+    const S s{};
 
     ed.add(&S::run1);
     //ed.add(&S::run3); //wont compile
@@ -102,7 +102,7 @@ TEST_CASE("event_dispatcher") {
 
   SECTION("object const ref") {
     bone::event_dispatcher<S const&> ed;
-    const S s;
+    const S s{};
 
     ed.add(&S::run1);
     //ed.add(&S::run3); //wont compile
