@@ -7,10 +7,12 @@ namespace bone{
 struct copy_counter {
   int copies = 0;
   int moves = 0;
+  mutable int copied_from = 0;
+  mutable int moved_from = 0;
 
   copy_counter() = default;
-  copy_counter(copy_counter const& rhs) noexcept { copies = rhs.copies; moves = rhs.moves; copies++; }
-  copy_counter(copy_counter&& rhs) noexcept { copies = rhs.copies; moves = rhs.moves; moves++; }
+  copy_counter(copy_counter const& rhs) noexcept { copies = rhs.copies; moves = rhs.moves; copies++; rhs.copied_from++; }
+  copy_counter(copy_counter&& rhs) noexcept { copies = rhs.copies; moves = rhs.moves; moves++; rhs.moved_from++; }
 };
 
 struct copy_only {
