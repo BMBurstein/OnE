@@ -28,15 +28,12 @@ public:
   }
 
   template <class F>
-  std::enable_if_t<!std::is_invocable_r_v<bool, F, Args...> && std::is_invocable_v<F, Args...> && std::is_invocable_v<F, std::remove_reference_t<Args>...>>
+  std::enable_if_t<!std::is_invocable_r_v<bool, F, Args...> && std::is_invocable_v<F, Args...>>
   add(F&& f) {
-    funcs.emplace_back([f_ = std::forward<F>(f)](Args... args) {std::invoke(std::move(f_), std::move(args)...); return true; });
+    funcs.emplace_back([f_ = std::forward<F>(f)](Args... args) {std::invoke(std::move(f_), std::forward<Args>(args)...); return true; });
   }
 
   template <class F>
-  std::enable_if_t<!std::is_invocable_r_v<bool, F, Args...> && std::is_invocable_v<F, Args...> && !std::is_invocable_v<F, std::remove_reference_t<Args>...>>
-  add(F&& f) {
-    funcs.emplace_back([f_ = std::forward<F>(f)](Args... args) {std::invoke(std::move(f_), args...); return true; });
   }
 private:
   std::vector<func_t> funcs;
