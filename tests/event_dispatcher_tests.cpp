@@ -1,4 +1,5 @@
 #include "bone/event_dispatcher.hpp"
+#include "bone/move_checker.hpp"
 
 #include "catch.hpp"
 
@@ -15,13 +16,14 @@ namespace {
     void count() const { c++; }
   };
 
-  void func1(S) { }
-  void func2(S const) { }
+  void func1(S s) { s.count(); }
+  void func2(S const s) { s.count(); }
   void func3(S& s) { s.count(); }
   void func4(S const& s) { s.count(); }
+  void func5(S&& s) { s.count(); }
 
-  bool true_f(int a, int& b) { b += a; return true; }
-  bool false_f(int a, int& b) { b += a; return false; }
+  bool true_f(int a, int& b) { b += a; a++; return true; }
+  bool false_f(int a, int& b) { b += a; a++; return false; }
 }
 
 TEST_CASE("event_dispatcher") {
@@ -36,6 +38,7 @@ TEST_CASE("event_dispatcher") {
 
     REQUIRE(ed(step, sum));
     REQUIRE(sum == 51);
+    REQUIRE(step == 3);
   }
 
   SECTION("false") {
@@ -49,6 +52,7 @@ TEST_CASE("event_dispatcher") {
 
     REQUIRE_FALSE(ed(step, sum));
     REQUIRE(sum == 48);
+    REQUIRE(step == 3);
   }
 
   SECTION("object") {
@@ -61,6 +65,7 @@ TEST_CASE("event_dispatcher") {
     ed.add(func2);
     //ed.add(func3); //wont compile
     ed.add(func4);
+    ed.add(func5);
     ed.add(&S::flag);
     ed.add(&S::run2);
 
@@ -79,6 +84,7 @@ TEST_CASE("event_dispatcher") {
     ed.add(func2);
     ed.add(func3);
     ed.add(func4);
+    //ed.add(func5); //wont compile
     ed.add(&S::flag);
 
     REQUIRE_FALSE(ed(s));
@@ -95,6 +101,7 @@ TEST_CASE("event_dispatcher") {
     ed.add(func2);
     //ed.add(func3); //wont compile
     ed.add(func4);
+    //ed.add(func5); //wont compile
 
     REQUIRE(ed(s));
     REQUIRE(s.c == 0);
@@ -110,8 +117,60 @@ TEST_CASE("event_dispatcher") {
     ed.add(func2);
     //ed.add(func3); //wont compile
     ed.add(func4);
+    //ed.add(func5); //wont compile
 
     REQUIRE(ed(s));
     REQUIRE(s.c == 2);
+  }
+
+  SECTION("counting copies byval") {
+    bone::event_dispatcher<bone::copy_counter> ed;
+    bone::copy_counter cc;
+
+    ed.add([](bone::copy_counter cc) {
+      REQUIRE(cc.copies <= 2);
+      REQUIRE(cc.moves <= 1);
+      return true;
+    });
+    ed.add([](bone::copy_counter cc) {
+      REQUIRE(cc.copies <= 2);
+      REQUIRE(cc.moves <= 2);
+    });
+
+    REQUIRE(ed(cc));
+    REQUIRE(cc.copies == 0);
+    REQUIRE(cc.moves == 0);
+    REQUIRE(cc.copied_from == 1);
+    REQUIRE(cc.moved_from == 0);
+  }
+
+  SECTION("counting copies byref") {
+    bone::event_dispatcher<bone::copy_counter&> ed;
+    bone::copy_counter cc;
+
+    ed.add([](bone::copy_counter cc) {
+      REQUIRE(cc.copies <= 1);
+      REQUIRE(cc.moves == 0);
+      return true;
+    });
+    ed.add([](bone::copy_counter& cc) {
+      REQUIRE(cc.copies == 0);
+      REQUIRE(cc.moves == 0);
+      return true;
+    });
+    ed.add([](bone::copy_counter cc) {
+      REQUIRE(cc.copies <= 1);
+      REQUIRE(cc.moves == 0);
+    });
+    ed.add([](bone::copy_counter& cc) {
+      REQUIRE(cc.copies == 0);
+      REQUIRE(cc.moves == 0);
+    });
+
+    REQUIRE(ed(cc));
+    REQUIRE(cc.copies == 0);
+    REQUIRE(cc.moves == 0);
+    REQUIRE(cc.copied_from == 2);
+    REQUIRE(cc.moved_from == 0);
   }
 }
