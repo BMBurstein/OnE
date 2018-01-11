@@ -39,6 +39,16 @@ TEST_CASE("event_dispatcher") {
     REQUIRE(ed(step, sum));
     REQUIRE(sum == 51);
     REQUIRE(step == 3);
+
+    REQUIRE(ed.remove(true_f));
+    REQUIRE(ed(step, sum));
+    REQUIRE(sum == 57);
+
+    REQUIRE(ed.remove(true_f));
+    REQUIRE(ed.remove(true_f));
+    REQUIRE_FALSE(ed.remove(true_f));
+    REQUIRE(ed(step, sum));
+    REQUIRE(sum == 57);
   }
 
   SECTION("false") {
@@ -71,6 +81,13 @@ TEST_CASE("event_dispatcher") {
 
     REQUIRE_FALSE(ed(s));
     REQUIRE(s.c == 0);
+
+    REQUIRE(ed.remove(&S::run2));
+    REQUIRE(ed.remove(func1));
+    REQUIRE(ed.remove(&S::flag));
+    REQUIRE_FALSE(ed.remove(&S::run2));
+    REQUIRE_FALSE(ed.remove(func1));
+    REQUIRE_FALSE(ed.remove(&S::flag));
   }
 
   SECTION("object ref") {
@@ -89,6 +106,16 @@ TEST_CASE("event_dispatcher") {
 
     REQUIRE_FALSE(ed(s));
     REQUIRE(s.c == 4);
+
+    REQUIRE(ed.remove(func1));
+    REQUIRE(ed.remove(&S::flag));
+    REQUIRE(ed.remove(&S::run3));
+    REQUIRE_FALSE(ed.remove(func1));
+    REQUIRE_FALSE(ed.remove(&S::flag));
+    REQUIRE_FALSE(ed.remove(&S::run3));
+
+    REQUIRE(ed(s));
+    REQUIRE(s.c == 7);
   }
 
   SECTION("object const") {

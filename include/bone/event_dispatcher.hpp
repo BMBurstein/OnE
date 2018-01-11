@@ -30,13 +30,44 @@ public:
   template <class F>
   std::enable_if_t<!std::is_invocable_r_v<bool, F, Args...> && std::is_invocable_v<F, Args...>>
   add(F&& f) {
-    funcs.emplace_back([f_ = std::forward<F>(f)](Args... args) {std::invoke(std::move(f_), std::forward<Args>(args)...); return true; });
+    funcs.emplace_back(MyFunc<F>{std::forward<F>(f)});
   }
 
   template <class F>
+  std::enable_if_t<std::is_invocable_r_v<bool, F, Args...>, bool>
+  remove(F&& f) {
+    auto it = std::find_if(funcs.rbegin(), funcs.rend(), [&f](auto func) {
+      auto p = func.template target<std::decay_t<F>>();
+      return p ? std::equal_to<>()(*p, f) : false;
+    });
+    if (it != funcs.rend()) {
+      funcs.erase(it.base() - 1);
+      return true;
+    }
+    return false;
   }
+
+  template <class F>
+  std::enable_if_t<!std::is_invocable_r_v<bool, F, Args...> && std::is_invocable_v<F, Args...>, bool>
+  remove(F&& f) {
+    return remove(MyFunc<F>{std::forward<F>(f)});
+  }
+
 private:
   std::vector<func_t> funcs;
+
+  template <class iF>
+  struct MyFunc {
+    MyFunc(iF f) : func(std::move(f)) {}
+    bool operator()(Args... args) {
+      std::invoke(func, std::forward<Args>(args)...);
+      return true;
+    }
+
+    bool operator==(MyFunc const& rhs) { return std::equal_to<iF>()(func, rhs.func); }
+
+    iF func;
+  };
 };
 
 }
