@@ -8,6 +8,7 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/event_dispatcher.hpp
                  include/bone/move_checker.hpp
                  include/bone/c_api_interop.hpp
+                 include/bone/string_formatter.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
                tests/step_iterator_tests.cpp
