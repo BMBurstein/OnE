@@ -32,21 +32,20 @@ TEST_CASE("event_dispatcher") {
 
     int step = 3;
     int sum = 42;
-    ed.add(true_f);
-    ed.add(true_f);
-    ed.add(true_f);
+    auto h1 = ed.add(true_f);
+    auto h2 = ed.add(true_f);
+    auto h3 = ed.add(true_f);
 
     REQUIRE(ed(step, sum));
     REQUIRE(sum == 51);
     REQUIRE(step == 3);
 
-    REQUIRE(ed.remove(true_f));
+    ed.remove(h2);
     REQUIRE(ed(step, sum));
     REQUIRE(sum == 57);
 
-    REQUIRE(ed.remove(true_f));
-    REQUIRE(ed.remove(true_f));
-    REQUIRE_FALSE(ed.remove(true_f));
+    ed.remove(h1);
+    ed.remove(h3);
     REQUIRE(ed(step, sum));
     REQUIRE(sum == 57);
   }
@@ -69,25 +68,22 @@ TEST_CASE("event_dispatcher") {
     bone::event_dispatcher<S> ed;
     S s;
 
-    ed.add(&S::run1);
-    ed.add(&S::run3);
-    ed.add(func1);
-    ed.add(func2);
-    //ed.add(func3); //wont compile
-    ed.add(func4);
-    ed.add(func5);
-    ed.add(&S::flag);
-    ed.add(&S::run2);
+    auto h1 = ed.add(&S::run1);
+    auto h2 = ed.add(&S::run3);
+    auto h3 = ed.add(func1);
+    auto h4 = ed.add(func2);
+    //auto h5 = ed.add(func3); //wont compile
+    auto h6 = ed.add(func4);
+    //auto h7 ed.add(func5);
+    auto h8 = ed.add(&S::flag);
+    auto h9 = ed.add(&S::run2);
 
     REQUIRE_FALSE(ed(s));
     REQUIRE(s.c == 0);
 
-    REQUIRE(ed.remove(&S::run2));
-    REQUIRE(ed.remove(func1));
-    REQUIRE(ed.remove(&S::flag));
-    REQUIRE_FALSE(ed.remove(&S::run2));
-    REQUIRE_FALSE(ed.remove(func1));
-    REQUIRE_FALSE(ed.remove(&S::flag));
+    ed.remove(h9);
+    ed.remove(h3);
+    ed.remove(h8);
   }
 
   SECTION("object ref") {
@@ -95,24 +91,21 @@ TEST_CASE("event_dispatcher") {
     S s;
 
     s.flag = false;
-    ed.add(&S::run1);
-    ed.add(&S::run3);
-    ed.add(func1);
-    ed.add(func2);
-    ed.add(func3);
-    ed.add(func4);
-    //ed.add(func5); //wont compile
-    ed.add(&S::flag);
+    auto h1 = ed.add(&S::run1);
+    auto h2 = ed.add(&S::run3);
+    auto h3 = ed.add(func1);
+    auto h4 = ed.add(func2);
+    auto h5 = ed.add(func3);
+    auto h6 = ed.add(func4);
+    //auto h7 = ed.add(func5); //wont compile
+    auto h8 = ed.add(&S::flag);
 
     REQUIRE_FALSE(ed(s));
     REQUIRE(s.c == 4);
 
-    REQUIRE(ed.remove(func1));
-    REQUIRE(ed.remove(&S::flag));
-    REQUIRE(ed.remove(&S::run3));
-    REQUIRE_FALSE(ed.remove(func1));
-    REQUIRE_FALSE(ed.remove(&S::flag));
-    REQUIRE_FALSE(ed.remove(&S::run3));
+    ed.remove(h3);
+    ed.remove(h8);
+    ed.remove(h2);
 
     REQUIRE(ed(s));
     REQUIRE(s.c == 7);
