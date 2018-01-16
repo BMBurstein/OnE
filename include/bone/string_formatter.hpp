@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <string>
 #include <string_view>
+#include <type_traits>
 #include <vector>
 
 namespace bone {
@@ -100,10 +101,9 @@ public:
           case 'G':
           //case 'n':
           case 'p':
-            if (c.type == 0)
-              c.type = base[pos2];
+            c.type = base[pos2];
             stop = true;
-            break;
+            continue;
           default:
             stop = true;
           }
@@ -144,7 +144,25 @@ public:
     return *this;
   }
 
-  string_formatter& operator()(std::intmax_t val) {
+  string_formatter& operator()(const char* val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 's':
+      conv_it->s = val;
+      break;
+    case 'p':
+      conv_it->p = val;
+      break;
+    default:
+      error("string");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  template <class T>
+  std::enable_if_t<std::is_integral_v<T> && std::is_signed_v<T>, string_formatter&>
+  operator()(T val) {
     if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
     switch (conv_it->type) {
     case 'd':
@@ -158,7 +176,9 @@ public:
     return *this;
   }
 
-  string_formatter& operator()(std::uintmax_t val) {
+  template <class T>
+  std::enable_if_t<std::is_integral_v<T> && std::is_unsigned_v<T>, string_formatter&>
+  operator()(T val) {
     if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
     switch (conv_it->type) {
     case 'o':
@@ -194,7 +214,9 @@ public:
     return *this;
   }
 
-  string_formatter& operator()(void* val) {
+  template <class T>
+  std::enable_if_t<std::is_pointer_v<T>, string_formatter&>
+  operator()(T val) {
     if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
     switch (conv_it->type) {
     case 'p':
@@ -223,6 +245,11 @@ public:
     return *this;
   }
 
+  template <class Arg1, class Arg2, class... Args>
+  string_formatter& operator()(Arg1 val1, Arg2 val2, Args... args) {
+    return (*this)(val1)(val2, args...);
+  }
+
 private:
   enum class length_modifier { NA, hh, h, l, ll, j, z, t, L };
   enum class conversion_type { NA, c, s, d, o, x, X, u, f, e, E, a, A, g, G, n, p };
@@ -232,9 +259,9 @@ private:
       std::intmax_t i;
       std::uintmax_t u;
       std::double_t d;
-      std::string s;
-      void* p;
+      const void* p;
     };
+    std::string s;
     int width = 0;
     int precision = 0;
     char lenmod = 0;
