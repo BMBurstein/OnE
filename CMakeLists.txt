@@ -15,6 +15,7 @@ set(TEST_FILES tests/main_tests.cpp
                tests/event_dispatcher_tests.cpp
                tests/move_checker_tests.cpp
                tests/c_api_interop_tests.cpp
+               tests/string_formatter_tests.cpp
    )
 
 include_directories( include )
