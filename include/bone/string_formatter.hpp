@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <stdint.h>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -90,13 +91,14 @@ public:
           case 'X':
           case 'u':
           case 'f':
+          case 'F':
           case 'e':
           case 'E':
           case 'a':
           case 'A':
           case 'g':
           case 'G':
-          case 'n':
+          //case 'n':
           case 'p':
             if (c.type == 0)
               c.type = base[pos2];
@@ -112,18 +114,127 @@ public:
       }
     }
     parts.emplace_back(base.data() + pos1, base.size() - pos1);
+    conv_it = convs.begin();
   }
 
-  string_formatter& operator()(int val) {
-    if (convs.front().type == 'c') {
-
+  string_formatter& operator()(char val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'c':
+    case 'i':
+      conv_it->i = val;
+      break;
+    default:
+      error("char");
     }
+    ++conv_it;
+    return *this;
   }
+
+  string_formatter& operator()(std::string val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 's':
+      conv_it->s = std::move(val);
+      break;
+    default:
+      error("string");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  string_formatter& operator()(std::intmax_t val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'd':
+    case 'i':
+      conv_it->i = val;
+      break;
+    default:
+      error("integer");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  string_formatter& operator()(std::uintmax_t val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'o':
+    case 'x':
+    case 'X':
+    case 'u':
+      conv_it->u = val;
+      break;
+    default:
+      error("unsigned integer");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  string_formatter& operator()(std::double_t val) {
+    if(conv_it==convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'f':
+    case 'F':
+    case 'e':
+    case 'E':
+    case 'a':
+    case 'A':
+    case 'g':
+    case 'G':
+      conv_it->d = val;
+      break;
+    default:
+      error("double");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  string_formatter& operator()(void* val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'p':
+      conv_it->p = val;
+      break;
+    default:
+      error("double");
+    }
+    ++conv_it;
+    return *this;
+  }
+
+  string_formatter& operator()(char* val) {
+    if (conv_it == convs.end()) throw std::logic_error("Too many parameters");
+    switch (conv_it->type) {
+    case 'p':
+      conv_it->p = val;
+      break;
+    case 's':
+      conv_it->s = val;
+      break;
+    default:
+      error("double");
+    }
+    ++conv_it;
+    return *this;
+  }
+
 private:
   enum class length_modifier { NA, hh, h, l, ll, j, z, t, L };
   enum class conversion_type { NA, c, s, d, o, x, X, u, f, e, E, a, A, g, G, n, p };
 
   struct conversion {
+    union {
+      std::intmax_t i;
+      std::uintmax_t u;
+      std::double_t d;
+      std::string s;
+      void* p;
+    };
     int width = 0;
     int precision = 0;
     char lenmod = 0;
@@ -137,6 +248,7 @@ private:
   std::string base;
   std::vector<std::string_view> parts;
   std::vector<conversion> convs;
+  decltype(convs)::iterator conv_it;
 
   void error(std::string got) {
     throw std::logic_error("Expected __ got " + got);
