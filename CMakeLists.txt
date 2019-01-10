@@ -17,11 +17,11 @@ set(TEST_FILES tests/main_tests.cpp
    )
 
 include_directories( include )
-add_executable(bone ${TEST_FILES} ${HEADER_FILES})
+add_executable(bone_test ${TEST_FILES} ${HEADER_FILES})
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT bone)
-    target_compile_options(bone PRIVATE /permissive- /GR-)
+    target_compile_options(bone_test PRIVATE /permissive- /GR-)
 else()
-    target_compile_options(bone PRIVATE -fno-rtti)
+    target_compile_options(bone_test PRIVATE -fno-rtti)
 endif()
