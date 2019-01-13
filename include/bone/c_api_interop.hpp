@@ -1,6 +1,7 @@
 #include <memory>
 
 namespace bone {
+
 class buffer {
 public:
   buffer(std::size_t size)
