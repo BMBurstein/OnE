@@ -1,4 +1,4 @@
-#include "bone\move_checker.hpp"
+#include "bone/move_checker.hpp"
 
 #include "catch.hpp"
 
