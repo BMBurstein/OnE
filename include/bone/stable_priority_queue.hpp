@@ -4,18 +4,19 @@
 
 namespace bone {
   template<typename T,
-           typename _Compare  = std::less<T>,
+           typename _Compare = std::less<T>,
+           typename _CounterT = std::size_t,
            template<typename> class _Container = std::vector>
   class stable_pq {
   private:
     std::size_t _cnt;
 
     struct stable_item {
-      std::size_t idx;
+      _CounterT idx;
       T itm;
 
       template<typename... _Args>
-      stable_item(std::size_t i, _Args&&... __args)
+      stable_item(_CounterT i, _Args&&... __args)
       : idx(i),
         itm(std::forward<_Args>(__args)...)
       {}
