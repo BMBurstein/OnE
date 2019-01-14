@@ -8,12 +8,14 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/event_dispatcher.hpp
                  include/bone/move_checker.hpp
                  include/bone/c_api_interop.hpp
+                 include/bone/stable_priority_queue.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
                tests/step_iterator_tests.cpp
                tests/event_dispatcher_tests.cpp
                tests/move_checker_tests.cpp
                tests/c_api_interop_tests.cpp
+               tests/stable_priority_queue_tests.cpp
    )
 
 include_directories( include )
