@@ -9,6 +9,7 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/move_checker.hpp
                  include/bone/c_api_interop.hpp
                  include/bone/stable_priority_queue.hpp
+                 include/bone/cyclic_queue.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
                tests/step_iterator_tests.cpp
@@ -16,14 +17,15 @@ set(TEST_FILES tests/main_tests.cpp
                tests/move_checker_tests.cpp
                tests/c_api_interop_tests.cpp
                tests/stable_priority_queue_tests.cpp
+               tests/cyclic_queue_tests.cpp
    )
 
 include_directories( include )
-add_executable(bone ${TEST_FILES} ${HEADER_FILES})
+add_executable(bone_test ${TEST_FILES} ${HEADER_FILES})
 
 if( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
     set_property(DIRECTORY PROPERTY VS_STARTUP_PROJECT bone)
-    target_compile_options(bone PRIVATE /permissive- /GR-)
+    target_compile_options(bone_test PRIVATE /permissive- /GR-)
 else()
-    target_compile_options(bone PRIVATE -fno-rtti)
+    target_compile_options(bone_test PRIVATE -fno-rtti)
 endif()
