@@ -40,7 +40,7 @@ using sint_min_size_t =
   std::uintmax_t
 >>>>;
 
-template <std::intmax_t MAX, std::intmax_t MIN=0>
+template <std::uintmax_t MAX, std::intmax_t MIN=0>
 using int_min_size_t = std::conditional_t<MIN < 0, sint_min_size_t<MAX,MIN>, uint_min_size_t<MAX>>;
 
 }
