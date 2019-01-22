@@ -4,7 +4,7 @@
 
 #include <vector>
 
-TEST_CASE("move_checker") {
+TEST_CASE("move checker") {
   std::vector<bone::move_only> v;
   v.emplace_back();
   v.push_back(bone::move_only());
