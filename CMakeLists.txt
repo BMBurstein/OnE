@@ -9,7 +9,7 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/move_checker.hpp
                  include/bone/c_api_interop.hpp
                  include/bone/stable_priority_queue.hpp
-                 include/bone/cyclic_queue.hpp
+                 include/bone/fixed_size_queue.hpp
                  include/bone/util.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
@@ -18,7 +18,7 @@ set(TEST_FILES tests/main_tests.cpp
                tests/move_checker_tests.cpp
                tests/c_api_interop_tests.cpp
                tests/stable_priority_queue_tests.cpp
-               tests/cyclic_queue_tests.cpp
+               tests/fixed_size_queue_tests.cpp
                tests/util_tests.cpp
    )
 

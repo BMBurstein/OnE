@@ -1,4 +1,4 @@
-#include "bone/cyclic_queue.hpp"
+#include "bone/fixed_size_queue.hpp"
 
 #include "catch.hpp"
 
@@ -6,8 +6,8 @@ namespace {
   const std::size_t N = 16;
 }
 
-TEST_CASE("cyclic queue") {
-  bone::cyclic_queue<int, N> q;
+TEST_CASE("fixed size queue") {
+  bone::fixed_size_queue<int, N> q;
 
   SECTION("basic") {
     REQUIRE(q.empty());
