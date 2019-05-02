@@ -53,6 +53,7 @@ public:
     ++tail_;
     tail_ %= SIZE;
     ++size_;
+    return true;
   }
 
 private:
