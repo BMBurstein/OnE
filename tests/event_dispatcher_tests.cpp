@@ -26,7 +26,7 @@ namespace {
   bool false_f(int a, int& b) { b += a; a++; return false; }
 }
 
-TEST_CASE("event_dispatcher") {
+TEST_CASE("event dispatcher") {
   SECTION("basic") {
     bone::event_dispatcher<int, int&> ed;
 

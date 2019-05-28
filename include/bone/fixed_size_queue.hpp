@@ -7,9 +7,9 @@
 namespace bone {
 
 template <typename T, std::size_t SIZE>
-class cyclic_queue {
+class fixed_size_queue {
 public:
-  cyclic_queue() : head_(0), tail_(0), size_(0) { }
+  fixed_size_queue() : head_(0), tail_(0), size_(0) { }
   
   bool push(const T& val) {
     return emplace(val);
