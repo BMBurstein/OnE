@@ -11,6 +11,7 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/stable_priority_queue.hpp
                  include/bone/cyclic_queue.hpp
                  include/bone/noalloc_vector.hpp
+                 include/bone/multi_array.hpp
    )
 set(TEST_FILES tests/main_tests.cpp
                tests/step_iterator_tests.cpp
@@ -20,6 +21,7 @@ set(TEST_FILES tests/main_tests.cpp
                tests/stable_priority_queue_tests.cpp
                tests/cyclic_queue_tests.cpp
                tests/noalloc_vector_tests.cpp
+               tests/multi_array_tests.cpp
    )
 
 include_directories( include )
