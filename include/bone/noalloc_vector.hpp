@@ -101,14 +101,14 @@ public:
     GROW_FUNC_BODY(count <= capacity(), resize(count, value));
   }
 
-  void assign(typename std::vector<T>::size_type count, const T& value) {
+  bool assign(typename std::vector<T>::size_type count, const T& value) {
     GROW_FUNC_BODY(count <= capacity(), assign(count, value));
   }
   template <class ForwardIt>
-  void assign(ForwardIt first, ForwardIt last) {
+  bool assign(ForwardIt first, ForwardIt last) {
     GROW_FUNC_BODY(std::distance(first, last) <= capacity(), assign(std::move(first), std::move(last)));
   }
-  void assign(std::initializer_list<T> ilist) {
+  bool assign(std::initializer_list<T> ilist) {
     GROW_FUNC_BODY(ilist.size() <= capacity(), assign(std::move(ilist)));
   }
   
