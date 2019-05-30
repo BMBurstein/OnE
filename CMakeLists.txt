@@ -10,7 +10,7 @@ set(HEADER_FILES include/bone/step_iterator.hpp
                  include/bone/c_api_interop.hpp
                  include/bone/stable_priority_queue.hpp
                  include/bone/noalloc_vector.hpp
-                 include/bone/multi_array.hpp
+                 include/bone/multi_vector.hpp
                  include/bone/fixed_size_queue.hpp
                  include/bone/util.hpp
    )
@@ -21,7 +21,7 @@ set(TEST_FILES tests/main_tests.cpp
                tests/c_api_interop_tests.cpp
                tests/stable_priority_queue_tests.cpp
                tests/noalloc_vector_tests.cpp
-               tests/multi_array_tests.cpp
+               tests/multi_vector_tests.cpp
                tests/fixed_size_queue_tests.cpp
                tests/util_tests.cpp
    )
