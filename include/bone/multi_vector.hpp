@@ -5,7 +5,9 @@
 #include <array>
 #include <functional>
 #include <numeric>
-#include <iostream>
+//#include <iostream>
+#include <stdexcept>
+
 namespace bone {
 
 template <typename T, std::size_t N>
@@ -14,20 +16,29 @@ public:
   frag(T* data, std::size_t* sizes) : data(data), sizes(sizes) {}
 
   template <typename... Args>
-  auto operator()(std::size_t i, Args... args) {
-    return frag<T, N-1>(data + i*sizes[1], sizes+1)(args...);
+  std::conditional_t<sizeof...(Args) == N, T&, frag<T,N-sizeof...(Args)>>
+  operator()(Args... args) {
+    return getFrag(std::forward<Args>(args)...).get();
   }
-  auto operator()(std::size_t i) {
-    return frag<T, N-1>(data + i*sizes[1], sizes+1);
-  }
-  auto operator[](std::size_t i) {
-    return operator()(i);
+  std::conditional_t<N==1, T&, frag<T,N-1>>
+  operator[](std::size_t i) {
+    return getFrag(i).get();
   }
 
   std::size_t size() {
     return sizes[0] / sizes[1];
   }
 
+public:
+  template <typename... Args>
+  auto getFrag(std::size_t i, Args... args) {
+    return frag<T, N-1>(data + i*sizes[1], sizes+1).getFrag(std::forward<Args>(args)...);
+  }
+  auto getFrag(std::size_t i) {
+    return frag<T, N-1>(data + i*sizes[1], sizes+1);
+  }
+  frag& get() { return *this; }
+  
 private:
   T* data;
   std::size_t* sizes;
@@ -37,12 +48,7 @@ template <typename T>
 class frag<T, 0> {
 public:
   frag(T* data, std::size_t*) : data(*data) {}
-  operator T&() { return data; }
-  operator T const&() const { return data; }
-  template <typename U>
-  auto operator=(U&& rhs) {
-    return data = std::forward<U>(rhs);
-  }
+  T& get() { return data; }
 private:
   T& data;
 };
