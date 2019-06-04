@@ -16,12 +16,11 @@ public:
   frag(T* data, std::size_t* sizes) : data(data), sizes(sizes) {}
 
   template <typename... Args>
-  std::conditional_t<sizeof...(Args) == N, T&, frag<T,N-sizeof...(Args)>>
-  operator()(Args... args) {
+  decltype(auto) operator()(Args&&... args) {
     return getFrag(std::forward<Args>(args)...).get();
   }
-  std::conditional_t<N==1, T&, frag<T,N-1>>
-  operator[](std::size_t i) {
+
+  decltype(auto) operator[](std::size_t i) {
     return getFrag(i).get();
   }
 
@@ -31,13 +30,13 @@ public:
 
 public:
   template <typename... Args>
-  auto getFrag(std::size_t i, Args... args) {
-    return frag<T, N-1>(data + i*sizes[1], sizes+1).getFrag(std::forward<Args>(args)...);
+  auto getFrag(std::size_t i, Args&&... args) {
+    return getFrag(i).getFrag(std::forward<Args>(args)...);
   }
   auto getFrag(std::size_t i) {
     return frag<T, N-1>(data + i*sizes[1], sizes+1);
   }
-  frag& get() { return *this; }
+  frag get() { return *this; }
   
 private:
   T* data;
