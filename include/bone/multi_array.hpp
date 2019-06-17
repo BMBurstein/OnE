@@ -63,14 +63,10 @@ public:
   decltype(auto) operator()(std::size_t i) {
     return operator[](i);
   }
-  template<std::size_t M=N>
-  std::enable_if_t<(M>1), frag<T,N-1>> operator[](std::size_t i) {
-    return frag<T, N-1>(data + i*sizes[1], sizes+1);
+  decltype(auto) operator[](std::size_t i) {
+    return lookup(i);
   }
-  template<std::size_t M=N>
-  std::enable_if_t<M==1, T&> operator[](std::size_t i) {
-    return data[i];
-  }
+
   
 private:
   T* data;
@@ -78,6 +74,15 @@ private:
 
   template <typename U, std::size_t M>
   friend class frag;
+  
+  template<std::size_t M=N>
+  std::enable_if_t<(M>1), frag<T,N-1>> lookup(std::size_t i) {
+    return frag<T, N-1>(data + i*sizes[1], sizes+1);
+  }
+  template<std::size_t M=N>
+  std::enable_if_t<M==1, T&> lookup(std::size_t i) {
+    return data[i];
+  }
 };
 
 template <typename T, std::size_t N>
