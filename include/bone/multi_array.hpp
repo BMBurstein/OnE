@@ -5,7 +5,6 @@
 #include <array>
 #include <functional>
 #include <numeric>
-//#include <iostream>
 #include <stdexcept>
 #include <algorithm>
 
@@ -34,13 +33,11 @@ public:
     return *this;
   }
 
-  template <typename... Args>
-  decltype(auto) operator()(Args&&... args) {
-    return getFrag(std::forward<Args>(args)...).get();
+  bool operator==(frag const& rhs) const {
+    return std::equal(sizes, sizes+N, rhs.sizes) && std::equal(data, data+sizes[0], rhs.data);
   }
-
-  decltype(auto) operator[](std::size_t i) {
-    return getFrag(i).get();
+  bool operator!=(frag const& rhs) const {
+    return !(*this == rhs);
   }
 
   std::size_t size() {
@@ -58,36 +55,29 @@ public:
 protected:
   frag(T* data, std::size_t* sizes) : data(data), sizes(sizes) {}
   
-private:
-  template <typename U, std::size_t M>
-  friend class frag;
-
+public:
   template <typename... Args>
-  auto getFrag(std::size_t i, Args&&... args) {
-    return getFrag(i).getFrag(std::forward<Args>(args)...);
+  decltype(auto) operator()(std::size_t i, Args&&... args) {
+    return operator[](i)(std::forward<Args>(args)...);
   }
-  auto getFrag(std::size_t i) {
+  decltype(auto) operator()(std::size_t i) {
+    return operator[](i);
+  }
+  template<std::size_t M=N>
+  std::enable_if_t<(M>1), frag<T,N-1>> operator[](std::size_t i) {
     return frag<T, N-1>(data + i*sizes[1], sizes+1);
   }
-  frag get() { return *this; }
+  template<std::size_t M=N>
+  std::enable_if_t<M==1, T&> operator[](std::size_t i) {
+    return data[i];
+  }
   
 private:
   T* data;
   std::size_t* sizes;
-};
 
-template <typename T>
-class frag<T, 0> {
-public:
-  frag(T* data, std::size_t*) : data(*data) {}
-
-private:
   template <typename U, std::size_t M>
   friend class frag;
-
-  T& get() { return data; }
-private:
-  T& data;
 };
 
 template <typename T, std::size_t N>

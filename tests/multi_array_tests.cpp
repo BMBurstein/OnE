@@ -42,8 +42,22 @@ TEST_CASE("multi array") {
     }
 
     SECTION("compare") {
-      bone::multi_array<int,3> b(4,2,3);
-
+      bone::multi_array<int,2> b(2,3);
+      a(2,1) = {42,34,56};
+      a(2,2) = {1,2,3};
+      b(1) = {42,34,56};
+      b(2) = {1,2,3};
+      REQUIRE(a[2] == b);
+      REQUIRE(a(2)[0] == b[0]);
+      REQUIRE(a(2,1) == b(1));
+      REQUIRE_FALSE(a(2)[1] == b[0]);
+      REQUIRE_FALSE(a(2,0) == b(1));
+      
+      REQUIRE_FALSE(a[2] != b);
+      REQUIRE_FALSE(a(2)[0] != b[0]);
+      REQUIRE_FALSE(a(2,1) != b(1));
+      REQUIRE(a(2)[1] != b[0]);
+      REQUIRE(a(2,0) != b(1));
     }
   }
 
