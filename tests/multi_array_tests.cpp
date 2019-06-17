@@ -39,6 +39,15 @@ TEST_CASE("multi array") {
       REQUIRE(a(2,1,0) == 1);
       REQUIRE(a(2,1,1) == 2);
       REQUIRE(a(2,1,2) == 3);
+      REQUIRE(a(0,1) == a(2,1));
+      REQUIRE(a(0,1) == a(0,1));
+
+      a(2,1) = a(2,1);
+      REQUIRE(a(2,1,0) == 1);
+      REQUIRE(a(2,1,1) == 2);
+      REQUIRE(a(2,1,2) == 3);
+      REQUIRE(a(0,1) == a(2,1));
+      REQUIRE(a(2,1) == a(2,1));
     }
 
     SECTION("compare") {
@@ -47,6 +56,7 @@ TEST_CASE("multi array") {
       a(2,2) = {1,2,3};
       b(1) = {42,34,56};
       b(2) = {1,2,3};
+
       REQUIRE(a[2] == b);
       REQUIRE(a(2)[0] == b[0]);
       REQUIRE(a(2,1) == b(1));
@@ -58,6 +68,10 @@ TEST_CASE("multi array") {
       REQUIRE_FALSE(a(2,1) != b(1));
       REQUIRE(a(2)[1] != b[0]);
       REQUIRE(a(2,0) != b(1));
+
+      REQUIRE(b[0] != b[1]);
+      b[0] = b[1];
+      REQUIRE(b[0] == b[1]);
     }
   }
 

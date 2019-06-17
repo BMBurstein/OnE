@@ -14,6 +14,7 @@ template <typename T, std::size_t N>
 class frag {
 public:
   frag& operator=(frag const& rhs) {
+    if(&rhs == this) return *this;
     if(std::equal(sizes, sizes+N, rhs.sizes)) {
       std::copy(rhs.data, rhs.data+*sizes, data);
     }
