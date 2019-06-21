@@ -52,10 +52,10 @@ TEST_CASE("multi array") {
 
     SECTION("compare") {
       bone::multi_array<int,2> b(2,3);
-      a(2,1) = {42,34,56};
-      a(2,2) = {1,2,3};
-      b(1) = {42,34,56};
-      b(2) = {1,2,3};
+      a(2,0) = {42,34,56};
+      a(2,1) = {1,2,3};
+      b(0) = {42,34,56};
+      b(1) = {1,2,3};
 
       REQUIRE(a[2] == b);
       REQUIRE(a(2)[0] == b[0]);
@@ -72,6 +72,12 @@ TEST_CASE("multi array") {
       REQUIRE(b[0] != b[1]);
       b[0] = b[1];
       REQUIRE(b[0] == b[1]);
+    }
+
+    SECTION("iterate") {
+      for(auto it=a(1,0).begin(); it!=a(1,0).end(); ++it) {
+        *it = 3;
+      }
     }
   }
 

@@ -68,11 +68,55 @@ public:
     return lookup(i);
   }
 
+private:
+  class iterator_base {
+    typedef std::random_access_iterator_tag         iterator_category;
+    typedef std::ptrdiff_t                          difference_type;
+
+  public:
+    iterator_base(T* data, std::size_t* sizes) : data(data), sizes(sizes) {}
+
+    bool operator==(iterator_base const& rhs) { return data == rhs.data && sizes == rhs.sizes; }
+    bool operator!=(iterator_base const& rhs) { return !operator==(rhs); }
+    iterator_base& operator++() { data += sizes[1]; return *this; }
+    
+  protected:
+    T* data;
+    std::size_t* sizes;
+  };
+
+  template<std::size_t M, int I42=0>
+  class iteratorN final : public iterator_base {
+  public:
+    typedef frag<T, N-1> value_type;
+    typedef value_type*  pointer;
+    typedef frag<T, N-1> reference;
+
+    using iterator_base::iterator_base;
+    frag<T,N> operator*() { return {this->data, this->sizes}; }
+  };
+
+  template<int I42>
+  class iteratorN<1, I42> final : public iterator_base {
+  public:
+    typedef T            value_type;
+    typedef value_type*  pointer;
+    typedef value_type&  reference;
+
+    using iterator_base::iterator_base;
+    T& operator*() { return *this->data; }
+  };
+
+public:
+  using iterator = iteratorN<N>;
+
+  iterator begin() { return iterator(data, sizes); }
+  iterator end() { return iterator(data + sizes[0], sizes); }
   
 private:
   T* data;
   std::size_t* sizes;
-
+  
   template <typename U, std::size_t M>
   friend class frag;
   
